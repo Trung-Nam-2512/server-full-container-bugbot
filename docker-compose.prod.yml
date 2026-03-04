@@ -337,10 +337,12 @@ services:
     ports:
       - "1447:8080" # Label Studio UI → Nginx label.nguyentrungnam.com
     environment:
-      - LABEL_STUDIO_HOST=0.0.0.0
+      - LABEL_STUDIO_HOST=https://label.nguyentrungnam.com
       - LABEL_STUDIO_PORT=8080
       - LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
       - LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/data
+      # Fix CSRF error when accessed via Cloudflare reverse proxy
+      - CSRF_TRUSTED_ORIGINS=https://label.nguyentrungnam.com
       - AWS_S3_ENDPOINT=http://minio:9000
       - AWS_S3_REGION_NAME=us-east-1
       - AWS_S3_ADDRESSING_STYLE=path
