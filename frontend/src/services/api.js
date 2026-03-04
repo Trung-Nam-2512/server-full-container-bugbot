@@ -76,32 +76,32 @@ api.interceptors.response.use(
 
 export const apiService = {
     // MQTT connection status
-    getMqttStatus: () => api.get('/iot/mqtt/status'),
+    getMqttStatus: () => api.get('/api/iot/mqtt/status'),
 
     // Device management (new registry-based)
-    getDevices: () => api.get('/iot/mqtt/devices'),
-    getDeviceDetail: (deviceId) => api.get(`/iot/mqtt/devices/${deviceId}`),
-    getDeviceStatus: (deviceId) => api.get(`/iot/mqtt/devices/${deviceId}/status`),
-    deleteDevice: (deviceId) => api.delete(`/iot/mqtt/devices/${deviceId}`),
+    getDevices: () => api.get('/api/iot/mqtt/devices'),
+    getDeviceDetail: (deviceId) => api.get(`/api/iot/mqtt/devices/${deviceId}`),
+    getDeviceStatus: (deviceId) => api.get(`/api/iot/mqtt/devices/${deviceId}/status`),
+    deleteDevice: (deviceId) => api.delete(`/api/iot/mqtt/devices/${deviceId}`),
 
     // Device commands
-    capturePhoto: (deviceId) => api.post(`/iot/mqtt/devices/${deviceId}/capture`),
-    requestStatus: (deviceId) => api.post(`/iot/mqtt/devices/${deviceId}/request-status`),
-    resetDevice: (deviceId) => api.post(`/iot/mqtt/devices/${deviceId}/reset`),
-    restartCamera: (deviceId) => api.post(`/iot/mqtt/devices/${deviceId}/restart-camera`),
+    capturePhoto: (deviceId) => api.post(`/api/iot/mqtt/devices/${deviceId}/capture`),
+    requestStatus: (deviceId) => api.post(`/api/iot/mqtt/devices/${deviceId}/request-status`),
+    resetDevice: (deviceId) => api.post(`/api/iot/mqtt/devices/${deviceId}/reset`),
+    restartCamera: (deviceId) => api.post(`/api/iot/mqtt/devices/${deviceId}/restart-camera`),
     setAutoConfig: (deviceId, enabled, seconds) =>
-        api.post(`/iot/mqtt/devices/${deviceId}/auto-config`, { enabled, seconds }),
+        api.post(`/api/iot/mqtt/devices/${deviceId}/auto-config`, { enabled, seconds }),
 
     // OTA
-    otaCheck: (deviceId) => api.post(`/iot/mqtt/devices/${deviceId}/ota/check`),
-    otaUpdate: (deviceId) => api.post(`/iot/mqtt/devices/${deviceId}/ota/update`),
+    otaCheck: (deviceId) => api.post(`/api/iot/mqtt/devices/${deviceId}/ota/check`),
+    otaUpdate: (deviceId) => api.post(`/api/iot/mqtt/devices/${deviceId}/ota/update`),
 
     // Broadcast
-    broadcastCapture: () => api.post('/iot/mqtt/broadcast/capture'),
+    broadcastCapture: () => api.post('/api/iot/mqtt/broadcast/capture'),
 
     // Events polling
-    getEvents: (params = {}) => api.get('/iot/mqtt/events', { params }),
-    getLatestEvents: (limit = 20) => api.get('/iot/mqtt/events/latest', { params: { limit } }),
+    getEvents: (params = {}) => api.get('/api/iot/mqtt/events', { params }),
+    getLatestEvents: (limit = 20) => api.get('/api/iot/mqtt/events/latest', { params: { limit } }),
 
     // Image management
     getImages: (params = {}) => {
