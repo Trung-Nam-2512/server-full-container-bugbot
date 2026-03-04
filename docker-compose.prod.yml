@@ -148,7 +148,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-mongodb123}
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-iot}
     ports:
-      - "27017:27017"
+      - "44017:27017"
     volumes:
       - mongodb_data:/data/db
       - ./infra/mongodb/init:/docker-entrypoint-initdb.d:ro
