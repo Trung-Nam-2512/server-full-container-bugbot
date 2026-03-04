@@ -35,7 +35,7 @@ services:
     ports:
       - "19092:19092" # Kafka API (external)
       - "18081:18081" # Schema Registry (external)
-      - "18082:18082" # HTTP Proxy (external)
+      - "1440:8082" # HTTP Proxy → Nginx kafka.nguyentrungnam.com
       - "9644:9644" # Admin API
     volumes:
       - redpanda_data:/var/lib/redpanda/data
@@ -69,7 +69,7 @@ services:
       MINIO_DOMAIN: minio
     ports:
       - "9002:9000" # S3 API
-      - "9001:9001" # Console UI
+      - "1441:9001" # Console UI → Nginx minio.nguyentrungnam.com
     volumes:
       - minio_data:/data
     healthcheck:
@@ -112,7 +112,7 @@ services:
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
       CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-clickhouse123}
     ports:
-      - "8123:8123" # HTTP interface
+      - "1443:8123" # HTTP interface → Nginx clickhouse.nguyentrungnam.com
       - "9000:9000" # Native client
     ulimits:
       nofile:
@@ -255,7 +255,7 @@ services:
       dockerfile: Dockerfile
     container_name: bugbot-ai-inference
     ports:
-      - "8000:8000"
+      - "1446:8000" # AI Inference HTTP → Nginx ai.nguyentrungnam.com
     environment:
       - SERVICE_PORT=8000
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
@@ -305,7 +305,7 @@ services:
     image: heartexlabs/label-studio:latest
     container_name: bugbot-label-studio
     ports:
-      - "8082:8080"
+      - "1447:8080" # Label Studio UI → Nginx label.nguyentrungnam.com
     environment:
       - LABEL_STUDIO_HOST=0.0.0.0
       - LABEL_STUDIO_PORT=8080
