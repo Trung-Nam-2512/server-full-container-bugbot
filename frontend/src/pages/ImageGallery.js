@@ -304,118 +304,118 @@ const ImageGallery = () => {
             ) : (
                 <Spin spinning={loading}>
                     {images.length === 0 ? (
-                    <Empty
-                        image={<FileImageOutlined style={{ fontSize: 64, color: '#d9d9d9' }} />}
-                        description="Không có ảnh nào"
-                    />
-                ) : (
-                    <>
-                        <Row gutter={[16, 16]}>
-                            {images.map((image) => (
-                                <Col xs={24} sm={12} md={8} lg={6} key={image.id}>
-                                    <Card
-                                        className="image-card"
-                                        hoverable
-                                        cover={
-                                            <div style={{ position: 'relative' }}>
-                                                <Image
-                                                    src={image.url}
-                                                    alt={image.filename}
-                                                    style={{ height: 200, objectFit: 'cover' }}
-                                                    preview={false}
-                                                    onClick={() => setPreviewImage(image)}
-                                                />
-
-                                                <div style={{ position: 'absolute', top: 8, left: 8 }}>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedImages.some(img => img.id === image.id)}
-                                                        onChange={(e) => handleImageSelect(image, e.target.checked)}
-                                                        style={{ transform: 'scale(1.2)' }}
+                        <Empty
+                            image={<FileImageOutlined style={{ fontSize: 64, color: '#d9d9d9' }} />}
+                            description="Không có ảnh nào"
+                        />
+                    ) : (
+                        <>
+                            <Row gutter={[16, 16]}>
+                                {images.map((image) => (
+                                    <Col xs={24} sm={12} md={8} lg={6} key={image.id}>
+                                        <Card
+                                            className="image-card"
+                                            hoverable
+                                            cover={
+                                                <div style={{ position: 'relative' }}>
+                                                    <Image
+                                                        src={apiService.getImageServeUrl(image.id)}
+                                                        alt={image.filename}
+                                                        style={{ height: 200, objectFit: 'cover' }}
+                                                        preview={false}
+                                                        onClick={() => setPreviewImage(image)}
                                                     />
-                                                </div>
 
-                                                <div style={{ position: 'absolute', top: 8, right: 8 }}>
-                                                    <Space>
-                                                        <Tooltip title="Xem">
-                                                            <Button
-                                                                type="primary"
-                                                                size="small"
-                                                                icon={<EyeOutlined />}
-                                                                onClick={() => setPreviewImage(image)}
-                                                            />
-                                                        </Tooltip>
-                                                        <Tooltip title="Tải về">
-                                                            <Button
-                                                                size="small"
-                                                                icon={<DownloadOutlined />}
-                                                                onClick={() => handleDownload(image)}
-                                                            />
-                                                        </Tooltip>
-                                                        <Tooltip title="Xóa">
-                                                            <Button
-                                                                size="small"
-                                                                danger
-                                                                icon={<DeleteOutlined />}
-                                                                onClick={() => handleDelete(image)}
-                                                            />
-                                                        </Tooltip>
-                                                    </Space>
-                                                </div>
-                                            </div>
-                                        }
-                                    >
-                                        <Card.Meta
-                                            title={
-                                                <Text ellipsis style={{ fontSize: '14px' }}>
-                                                    {image.filename || `Image ${image.id}`}
-                                                </Text>
-                                            }
-                                            description={
-                                                <Space direction="vertical" size={4}>
-                                                    <Space>
-                                                        <Tag color="blue" icon={<CameraOutlined />}>
-                                                            {image.deviceId}
-                                                        </Tag>
-                                                        <Text type="secondary" style={{ fontSize: '12px' }}>
-                                                            {formatFileSize(image.size)}
-                                                        </Text>
-                                                    </Space>
-                                                    <Space>
-                                                        <CalendarOutlined />
-                                                        <Text type="secondary" style={{ fontSize: '12px' }}>
-                                                            {formatDate(image.createdAt)}
-                                                        </Text>
-                                                    </Space>
-                                                </Space>
-                                            }
-                                        />
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
+                                                    <div style={{ position: 'absolute', top: 8, left: 8 }}>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedImages.some(img => img.id === image.id)}
+                                                            onChange={(e) => handleImageSelect(image, e.target.checked)}
+                                                            style={{ transform: 'scale(1.2)' }}
+                                                        />
+                                                    </div>
 
-                        {/* Pagination */}
-                        <div style={{ textAlign: 'center', marginTop: 24 }}>
-                            <Pagination
-                                current={pagination.current}
-                                pageSize={pagination.pageSize}
-                                total={pagination.total}
-                                onChange={(page, pageSize) => {
-                                    setPagination(prev => ({
-                                        ...prev,
-                                        current: page,
-                                        pageSize: pageSize || prev.pageSize
-                                    }));
-                                }}
-                                showSizeChanger
-                                showQuickJumper
-                                showTotal={(total, range) =>
-                                    `${range[0]}-${range[1]} của ${total} ảnh`
-                                }
-                            />
-                        </div>
-                    </>
+                                                    <div style={{ position: 'absolute', top: 8, right: 8 }}>
+                                                        <Space>
+                                                            <Tooltip title="Xem">
+                                                                <Button
+                                                                    type="primary"
+                                                                    size="small"
+                                                                    icon={<EyeOutlined />}
+                                                                    onClick={() => setPreviewImage(image)}
+                                                                />
+                                                            </Tooltip>
+                                                            <Tooltip title="Tải về">
+                                                                <Button
+                                                                    size="small"
+                                                                    icon={<DownloadOutlined />}
+                                                                    onClick={() => handleDownload(image)}
+                                                                />
+                                                            </Tooltip>
+                                                            <Tooltip title="Xóa">
+                                                                <Button
+                                                                    size="small"
+                                                                    danger
+                                                                    icon={<DeleteOutlined />}
+                                                                    onClick={() => handleDelete(image)}
+                                                                />
+                                                            </Tooltip>
+                                                        </Space>
+                                                    </div>
+                                                </div>
+                                            }
+                                        >
+                                            <Card.Meta
+                                                title={
+                                                    <Text ellipsis style={{ fontSize: '14px' }}>
+                                                        {image.filename || `Image ${image.id}`}
+                                                    </Text>
+                                                }
+                                                description={
+                                                    <Space direction="vertical" size={4}>
+                                                        <Space>
+                                                            <Tag color="blue" icon={<CameraOutlined />}>
+                                                                {image.deviceId}
+                                                            </Tag>
+                                                            <Text type="secondary" style={{ fontSize: '12px' }}>
+                                                                {formatFileSize(image.size)}
+                                                            </Text>
+                                                        </Space>
+                                                        <Space>
+                                                            <CalendarOutlined />
+                                                            <Text type="secondary" style={{ fontSize: '12px' }}>
+                                                                {formatDate(image.createdAt)}
+                                                            </Text>
+                                                        </Space>
+                                                    </Space>
+                                                }
+                                            />
+                                        </Card>
+                                    </Col>
+                                ))}
+                            </Row>
+
+                            {/* Pagination */}
+                            <div style={{ textAlign: 'center', marginTop: 24 }}>
+                                <Pagination
+                                    current={pagination.current}
+                                    pageSize={pagination.pageSize}
+                                    total={pagination.total}
+                                    onChange={(page, pageSize) => {
+                                        setPagination(prev => ({
+                                            ...prev,
+                                            current: page,
+                                            pageSize: pageSize || prev.pageSize
+                                        }));
+                                    }}
+                                    showSizeChanger
+                                    showQuickJumper
+                                    showTotal={(total, range) =>
+                                        `${range[0]}-${range[1]} của ${total} ảnh`
+                                    }
+                                />
+                            </div>
+                        </>
                     )}
                 </Spin>
             )}
@@ -431,7 +431,7 @@ const ImageGallery = () => {
                 {previewImage && (
                     <div style={{ textAlign: 'center' }}>
                         <Image
-                            src={previewImage.url}
+                            src={apiService.getImageServeUrl(previewImage.id)}
                             alt={previewImage.filename}
                             className="fullscreen-image"
                         />

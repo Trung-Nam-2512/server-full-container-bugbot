@@ -112,14 +112,14 @@ exports.deleteImage = async (req, res, next) => {
 exports.getAnnotatedImage = async (req, res, next) => {
     try {
         const { id } = req.params;
-        
+
         // Get image data to find annotated URL
         const image = await imagesService.getImageById(id);
-        
+
         if (!image) {
             return res.status(404).json({ ok: false, error: "Image not found" });
         }
-        
+
         if (!image.hasDetections || !image.annotatedImageUrl) {
             return res.status(404).json({ ok: false, error: "No annotated image available" });
         }
@@ -140,12 +140,12 @@ exports.getAnnotatedImage = async (req, res, next) => {
 
         // Stream image from MinIO
         const stream = await minioClient.getObject(bucket, objectPath);
-        
+
         res.setHeader('Content-Type', image.mimeType || 'image/jpeg');
         res.setHeader('Content-Disposition', `inline; filename="${image.filename}"`);
-        
+
         stream.pipe(res);
-        
+
         stream.on('error', (error) => {
             logger.error({ error: error.message, bucket, objectPath }, 'Error streaming annotated image');
             if (!res.headersSent) {
@@ -161,14 +161,74 @@ exports.getAnnotatedImage = async (req, res, next) => {
 };
 
 /**
+ * GET /api/cam/images/:id/serve - Proxy stream ảnh từ MinIO về client (không cần auth)
+ */
+exports.serveImage = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        // Lấy image data từ DB để tìm objectKey
+        const image = await imagesService.getImageById(id);
+
+        if (!image) {
+            return res.status(404).json({ ok: false, error: 'Image not found' });
+        }
+
+        // Lấy MinIO client
+        const { getMinioClient, BUCKET_NAME } = require('../libs/minio');
+        const minioClient = getMinioClient();
+        if (!minioClient) {
+            return res.status(503).json({ ok: false, error: 'Storage service unavailable' });
+        }
+
+        // Trích xuất objectKey từ image_url lưu trong DB
+        // image_url thường có dạng: http://minio:9000/iot-raw/raw/yyyy/mm/dd/device/file.jpg
+        let objectKey = image.url || '';
+        try {
+            const urlObj = new URL(objectKey);
+            const parts = urlObj.pathname.split('/').filter(Boolean);
+            // Bỏ tên bucket (phần tử đầu), lấy phần còn lại là objectKey
+            if (parts.length > 1) {
+                objectKey = parts.slice(1).join('/');
+            } else {
+                objectKey = parts.join('/');
+            }
+        } catch {
+            // Nếu không phải URL đầy đủ, giả sử đã là objectKey
+            objectKey = objectKey.replace(/^\/?iot-raw\//, '');
+        }
+
+        logger.debug({ imageId: id, objectKey, bucket: BUCKET_NAME }, 'Serving image from MinIO');
+
+        const stream = await minioClient.getObject(BUCKET_NAME, objectKey);
+
+        res.setHeader('Content-Type', image.mimeType || 'image/jpeg');
+        res.setHeader('Content-Disposition', `inline; filename="${image.filename}"`);
+        res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache 1 ngày
+
+        stream.pipe(res);
+
+        stream.on('error', (error) => {
+            logger.error({ error: error.message, objectKey, bucket: BUCKET_NAME }, 'Error streaming image');
+            if (!res.headersSent) {
+                res.status(500).json({ ok: false, error: 'Failed to retrieve image' });
+            }
+        });
+    } catch (error) {
+        logger.error({ error: error.message, imageId: req.params.id }, 'Error in serveImage controller');
+        if (!res.headersSent) next(error);
+    }
+};
+
+/**
  * GET /api/cam/images/:id/detections - Get detection details
  */
 exports.getDetections = async (req, res, next) => {
     try {
         const { id } = req.params;
-        
+
         const image = await imagesService.getImageById(id);
-        
+
         if (!image) {
             return res.status(404).json({ ok: false, error: "Image not found" });
         }

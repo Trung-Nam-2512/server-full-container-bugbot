@@ -255,6 +255,7 @@ module.exports = {
     transformInternalUrlToPublic,
     deleteObject,
     isMinIOHealthy,
+    getMinioClient: () => minioClient,
     BUCKET_NAME,
 };
 

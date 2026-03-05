@@ -13,7 +13,10 @@ router.get("/:id/annotated", imagesController.getAnnotatedImage);
 router.get("/:id/detections", imagesController.getDetections);
 
 // GET /api/cam/images/:id/download - Download image file (must come before /:id)
-router.get("/:id/download", imagesController.downloadImage);
+router.get('/:id/download', imagesController.downloadImage);
+
+// GET /api/cam/images/:id/serve - Proxy image from MinIO (no auth needed, must come before /:id)
+router.get('/:id/serve', imagesController.serveImage);
 
 // GET /api/cam/images/:id - Get single image by ID
 router.get("/:id", imagesController.getImageById);

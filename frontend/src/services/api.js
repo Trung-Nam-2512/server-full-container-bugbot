@@ -111,6 +111,8 @@ export const apiService = {
     getImageById: (imageId) => api.get(`/api/cam/images/${imageId}`),
     deleteImage: (imageId) => api.delete(`/api/cam/images/${imageId}`),
     downloadImage: (imageId) => api.get(`/api/cam/images/${imageId}/download`, { responseType: 'blob' }),
+    // Serve image directly (no MinIO auth needed - backend proxies from MinIO)
+    getImageServeUrl: (imageId) => `/api/cam/images/${imageId}/serve`,
 
     // Statistics
     getStats: () => api.get('/api/cam/stats'),
