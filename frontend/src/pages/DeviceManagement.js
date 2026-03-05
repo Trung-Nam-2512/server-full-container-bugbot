@@ -33,7 +33,7 @@ const DeviceManagement = () => {
     const sendCmd = async (deviceId, label, apiFn) => {
         try {
             await apiFn();
-            message.success(`"${label}" gui den ${deviceId}`);
+            message.success(`"${label}" gửi đến ${deviceId}`);
         } catch (error) {
             message.error(formatErrorMessage(error));
         }
@@ -51,7 +51,7 @@ const DeviceManagement = () => {
     const handleConfigSubmit = async (values) => {
         try {
             await apiService.setAutoConfig(selectedDevice.deviceId, values.autoEnabled, values.intervalSeconds);
-            message.success('Cap nhat cau hinh thanh cong');
+            message.success('Cập nhật cấu hình thành công');
             setConfigModalVisible(false);
             refresh();
         } catch (error) {
@@ -61,21 +61,21 @@ const DeviceManagement = () => {
 
     const handleDelete = (device) => {
         Modal.confirm({
-            title: 'Xac nhan xoa thiet bi',
+            title: 'Xác nhận xóa thiết bị',
             content: (
                 <div>
-                    <p>Ban co chac chan muon xoa thiet bi <strong>{device.deviceId}</strong>?</p>
-                    <p style={{ color: '#ff4d4f' }}>Hanh dong nay khong the hoan tac.</p>
+                    <p>Bạn có chắc chắn muốn xóa thiết bị <strong>{device.deviceId}</strong>?</p>
+                    <p style={{ color: '#ff4d4f' }}>Hành động này không thể hoàn tác.</p>
                 </div>
             ),
-            okText: 'Xoa', okType: 'danger', cancelText: 'Huy',
+            okText: 'Xóa', okType: 'danger', cancelText: 'Hủy',
             onOk: async () => {
                 try {
                     await apiService.deleteDevice(device.deviceId);
-                    message.success(`Da xoa ${device.deviceId}`);
+                    message.success(`Đã xóa ${device.deviceId}`);
                     refresh();
                 } catch (error) {
-                    handleApiError(error, { defaultMessage: 'Khong the xoa thiet bi' });
+                    handleApiError(error, { defaultMessage: 'Không thể xóa thiết bị' });
                 }
             },
         });
@@ -83,7 +83,7 @@ const DeviceManagement = () => {
 
     const columns = [
         {
-            title: 'Thiet bi',
+            title: 'Thiết bị',
             dataIndex: 'deviceId',
             key: 'deviceId',
             render: (text) => (
@@ -93,7 +93,7 @@ const DeviceManagement = () => {
             ),
         },
         {
-            title: 'Trang thai',
+            title: 'Trạng thái',
             key: 'status',
             width: 110,
             render: (_, record) => <StatusBadge device={record} />,
@@ -125,21 +125,21 @@ const DeviceManagement = () => {
             },
         },
         {
-            title: 'Lan cuoi',
+            title: 'Lần cuối',
             dataIndex: 'lastSeenAt',
             key: 'lastSeenAt',
             width: 130,
             render: (date) => date ? dayjs(date).fromNow() : '-',
         },
         {
-            title: 'Hanh dong',
+            title: 'Hành động',
             key: 'actions',
             width: 320,
             render: (_, record) => (
                 <Space size={4} wrap>
                     <Button size="small" type="primary" icon={<PlayCircleOutlined />}
                         onClick={() => sendCmd(record.deviceId, 'capture', () => apiService.capturePhoto(record.deviceId))}>
-                        Chup
+                        Chụp
                     </Button>
                     <Button size="small" icon={<SyncOutlined />}
                         onClick={() => sendCmd(record.deviceId, 'ota_check', () => apiService.otaCheck(record.deviceId))}>
@@ -149,7 +149,7 @@ const DeviceManagement = () => {
                         Config
                     </Button>
                     <Button size="small" icon={<InfoCircleOutlined />} onClick={() => navigate(`/devices/${record.deviceId}`)}>
-                        Chi tiet
+                        Chi tiết
                     </Button>
                     <Button size="small" danger icon={<DeleteOutlined />} onClick={() => handleDelete(record)} />
                 </Space>
@@ -161,14 +161,14 @@ const DeviceManagement = () => {
         <div>
             {/* Header */}
             <div className="page-header">
-                <Title level={2} style={{ margin: 0 }}>Quan ly thiet bi</Title>
+                <Title level={2} style={{ margin: 0 }}>Quản lý thiết bị</Title>
                 <Space>
                     <Button icon={<SendOutlined />}
                         onClick={() => sendCmd('all', 'broadcast capture', () => apiService.broadcastCapture())}>
                         Capture All
                     </Button>
                     <Switch checked={autoRefresh} onChange={setAutoRefresh} checkedChildren="Auto" unCheckedChildren="Manual" />
-                    <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading}>Lam moi</Button>
+                    <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading}>Làm mới</Button>
                 </Space>
             </div>
 
@@ -176,7 +176,7 @@ const DeviceManagement = () => {
             <Row gutter={16} style={{ marginBottom: 24 }}>
                 <Col xs={24} sm={8}>
                     <Card className="stats-card">
-                        <Statistic title="Tong thiet bi" value={counts.total} prefix={<CameraOutlined />} valueStyle={{ color: '#1890ff' }} />
+                        <Statistic title="Tổng thiết bị" value={counts.total} prefix={<CameraOutlined />} valueStyle={{ color: '#1890ff' }} />
                     </Card>
                 </Col>
                 <Col xs={24} sm={8}>
@@ -187,7 +187,7 @@ const DeviceManagement = () => {
                 <Col xs={24} sm={8}>
                     <Card className="stats-card">
                         <Statistic
-                            title="Ty le online"
+                            title="Tỷ lệ online"
                             value={counts.total > 0 ? ((counts.online / counts.total) * 100).toFixed(1) : 0}
                             suffix="%" valueStyle={{ color: '#722ed1' }}
                         />
@@ -204,7 +204,7 @@ const DeviceManagement = () => {
                     loading={loading}
                     pagination={{
                         pageSize: 10, showSizeChanger: true, showQuickJumper: true,
-                        showTotal: (total, range) => `${range[0]}-${range[1]} cua ${total} thiet bi`,
+                        showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} thiết bị`,
                     }}
                     onRow={(record) => ({
                         onClick: () => navigate(`/devices/${record.deviceId}`),
@@ -216,24 +216,24 @@ const DeviceManagement = () => {
 
             {/* Config modal */}
             <Modal
-                title={`Cau hinh ${selectedDevice?.deviceId}`}
+                title={`Cấu hình ${selectedDevice?.deviceId}`}
                 open={configModalVisible}
                 onCancel={() => setConfigModalVisible(false)}
                 onOk={() => form.submit()}
                 width={420}
             >
                 <Form form={form} layout="vertical" onFinish={handleConfigSubmit}>
-                    <Form.Item name="autoEnabled" label="Tu dong chup" valuePropName="checked">
+                    <Form.Item name="autoEnabled" label="Tự động chụp" valuePropName="checked">
                         <Switch />
                     </Form.Item>
                     <Form.Item
-                        name="intervalSeconds" label="Chu ky chup (giay)"
+                        name="intervalSeconds" label="Chu kỳ chụp (giây)"
                         rules={[
-                            { required: true, message: 'Nhap chu ky' },
-                            { type: 'number', min: 3, max: 3600, message: '3 - 3600 giay' },
+                            { required: true, message: 'Nhập chu kỳ' },
+                            { type: 'number', min: 3, max: 3600, message: '3 - 3600 giây' },
                         ]}
                     >
-                        <InputNumber min={3} max={3600} style={{ width: '100%' }} addonAfter="giay" />
+                        <InputNumber min={3} max={3600} style={{ width: '100%' }} addonAfter="giây" />
                     </Form.Item>
                 </Form>
             </Modal>

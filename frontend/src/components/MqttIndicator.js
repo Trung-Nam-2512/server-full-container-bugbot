@@ -23,14 +23,14 @@ const MqttIndicator = () => {
 
     if (!enabled) {
         return (
-            <Tooltip title="MQTT disabled">
+            <Tooltip title="Đã tắt MQTT">
                 <Tag color="default"><ApiOutlined /> MQTT Off</Tag>
             </Tooltip>
         );
     }
 
     return (
-        <Tooltip title={connected ? 'MQTT connected to broker' : 'MQTT disconnected'}>
+        <Tooltip title={connected ? 'MQTT đã kết nối' : 'MQTT mất kết nối'}>
             <Tag color={connected ? 'success' : 'error'} className="status-badge">
                 <span className={`status-dot ${connected ? 'status-dot--online' : 'status-dot--offline'}`} />
                 <ApiOutlined /> MQTT

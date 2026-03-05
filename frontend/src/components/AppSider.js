@@ -19,10 +19,10 @@ const AppSider = () => {
     const location = useLocation();
 
     const menuItems = [
-        { key: '/',         icon: <DashboardOutlined />, label: 'Tong quan' },
-        { key: '/gallery',  icon: <PictureOutlined />,   label: 'Thu vien anh' },
-        { key: '/devices',  icon: <CameraOutlined />,    label: 'Thiet bi' },
-        { key: '/settings', icon: <SettingOutlined />,   label: 'Cai dat' },
+        { key: '/', icon: <DashboardOutlined />, label: 'Tổng quan' },
+        { key: '/gallery', icon: <PictureOutlined />, label: 'Thư viện ảnh' },
+        { key: '/devices', icon: <CameraOutlined />, label: 'Thiết bị' },
+        { key: '/settings', icon: <SettingOutlined />, label: 'Cài đặt' },
     ];
 
     return (

@@ -11,29 +11,29 @@ const api = axios.create({
 const getErrorMessage = (error) => {
     if (!error.response) {
         if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-            return { title: 'Het thoi gian cho', message: 'Yeu cau mat qua nhieu thoi gian. Vui long thu lai.', type: 'timeout' };
+            return { title: 'Hết thời gian chờ', message: 'Yêu cầu mất quá nhiều thời gian. Vui lòng thử lại.', type: 'timeout' };
         }
         if (error.message === 'Network Error') {
-            return { title: 'Loi ket noi', message: 'Khong the ket noi den server.', type: 'network' };
+            return { title: 'Lỗi kết nối', message: 'Không thể kết nối đến server.', type: 'network' };
         }
-        return { title: 'Loi khong xac dinh', message: error.message || 'Da xay ra loi.', type: 'unknown' };
+        return { title: 'Lỗi không xác định', message: error.message || 'Đã xảy ra lỗi.', type: 'unknown' };
     }
 
     const { status, data } = error.response;
-    const serverMessage = data?.error || data?.message || 'Da xay ra loi';
+    const serverMessage = data?.error || data?.message || 'Đã xảy ra lỗi';
 
     const messages = {
-        400: { title: 'Yeu cau khong hop le', type: 'bad_request' },
-        401: { title: 'Khong co quyen truy cap', type: 'unauthorized' },
-        403: { title: 'Bi tu choi truy cap', type: 'forbidden' },
-        404: { title: 'Khong tim thay', type: 'not_found' },
-        500: { title: 'Loi server', type: 'server_error' },
-        502: { title: 'Server khong kha dung', type: 'server_unavailable' },
-        503: { title: 'Server khong kha dung', type: 'server_unavailable' },
-        504: { title: 'Server khong kha dung', type: 'server_unavailable' },
+        400: { title: 'Yêu cầu không hợp lệ', type: 'bad_request' },
+        401: { title: 'Không có quyền truy cập', type: 'unauthorized' },
+        403: { title: 'Bị từ chối truy cập', type: 'forbidden' },
+        404: { title: 'Không tìm thấy', type: 'not_found' },
+        500: { title: 'Lỗi server', type: 'server_error' },
+        502: { title: 'Server không khả dụng', type: 'server_unavailable' },
+        503: { title: 'Server không khả dụng', type: 'server_unavailable' },
+        504: { title: 'Server không khả dụng', type: 'server_unavailable' },
     };
 
-    const info = messages[status] || { title: `Loi ${status}`, type: 'http_error' };
+    const info = messages[status] || { title: `Lỗi ${status}`, type: 'http_error' };
     return { ...info, message: serverMessage };
 };
 

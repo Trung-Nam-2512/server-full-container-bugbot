@@ -44,10 +44,10 @@ const DeviceDetail = () => {
         setCmdLoading((prev) => ({ ...prev, [name]: true }));
         try {
             await apiFn();
-            message.success(`Lenh "${name}" da gui thanh cong`);
+            message.success(`Lệnh "${name}" đã gửi thành công`);
             setTimeout(refresh, 1000);
         } catch (err) {
-            handleApiError(err, { defaultMessage: `Khong the gui lenh "${name}"` });
+            handleApiError(err, { defaultMessage: `Không thể gửi lệnh "${name}"` });
         } finally {
             setCmdLoading((prev) => ({ ...prev, [name]: false }));
         }
@@ -57,9 +57,9 @@ const DeviceDetail = () => {
         setCmdLoading((prev) => ({ ...prev, autoConfig: true }));
         try {
             await apiService.setAutoConfig(id, autoEnabled, intervalSec);
-            message.success('Cau hinh auto da cap nhat');
+            message.success('Cấu hình auto đã cập nhật');
         } catch (err) {
-            handleApiError(err, { defaultMessage: 'Khong the cap nhat cau hinh' });
+            handleApiError(err, { defaultMessage: 'Không thể cập nhật cấu hình' });
         } finally {
             setCmdLoading((prev) => ({ ...prev, autoConfig: false }));
         }
@@ -73,9 +73,9 @@ const DeviceDetail = () => {
         return (
             <Result
                 status="404"
-                title="Khong tim thay thiet bi"
-                subTitle={`Thiet bi "${id}" khong ton tai trong he thong.`}
-                extra={<Button type="primary" onClick={() => navigate('/devices')}>Quay lai</Button>}
+                title="Không tìm thấy thiết bị"
+                subTitle={`Thiết bị "${id}" không tồn tại trong hệ thống.`}
+                extra={<Button type="primary" onClick={() => navigate('/devices')}>Quay lại</Button>}
             />
         );
     }
@@ -94,16 +94,16 @@ const DeviceDetail = () => {
                     <Title level={3} style={{ margin: 0 }}>{device.deviceId}</Title>
                     <StatusBadge device={device} />
                 </Space>
-                <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading}>Lam moi</Button>
+                <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading}>Làm mới</Button>
             </div>
 
             <Row gutter={[16, 16]}>
                 {/* Info panel */}
                 <Col xs={24} lg={14}>
-                    <Card title="Thong tin thiet bi" size="small">
+                    <Card title="Thông tin thiết bị" size="small">
                         <Descriptions column={{ xs: 1, sm: 2 }} size="small" bordered>
                             <Descriptions.Item label="Device ID">{device.deviceId}</Descriptions.Item>
-                            <Descriptions.Item label="Trang thai">
+                            <Descriptions.Item label="Trạng thái">
                                 <StatusBadge device={device} />
                             </Descriptions.Item>
                             <Descriptions.Item label="Firmware">
@@ -119,18 +119,18 @@ const DeviceDetail = () => {
                             <Descriptions.Item label="Uptime">
                                 {device.uptime != null ? formatUptime(device.uptime) : 'N/A'}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Anh da chup">{device.imageCount || 0}</Descriptions.Item>
-                            <Descriptions.Item label="Lan cuoi thay">
-                                {device.lastSeenAt ? dayjs(device.lastSeenAt).fromNow() : 'Chua biet'}
+                            <Descriptions.Item label="Ảnh đã chụp">{device.imageCount || 0}</Descriptions.Item>
+                            <Descriptions.Item label="Lần cuối thấy">
+                                {device.lastSeenAt ? dayjs(device.lastSeenAt).fromNow() : 'Chưa biết'}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Online tu">
+                            <Descriptions.Item label="Online từ">
                                 {device.onlineSince ? dayjs(device.onlineSince).format('DD/MM/YYYY HH:mm') : 'N/A'}
                             </Descriptions.Item>
                         </Descriptions>
                     </Card>
 
                     {/* Control panel */}
-                    <Card title="Dieu khien" size="small" style={{ marginTop: 16 }}>
+                    <Card title="Điều khiển" size="small" style={{ marginTop: 16 }}>
                         <Space wrap>
                             <Button
                                 type="primary"
@@ -138,7 +138,7 @@ const DeviceDetail = () => {
                                 loading={cmdLoading.capture}
                                 onClick={() => sendCommand('capture', () => apiService.capturePhoto(id))}
                             >
-                                Chup anh
+                                Chụp ảnh
                             </Button>
                             <Button
                                 icon={<SyncOutlined />}
@@ -166,7 +166,7 @@ const DeviceDetail = () => {
                     </Card>
 
                     {/* Auto config */}
-                    <Card title={<Space><SettingOutlined /> Cau hinh Auto Capture</Space>} size="small" style={{ marginTop: 16 }}>
+                    <Card title={<Space><SettingOutlined /> Cấu hình Auto Capture</Space>} size="small" style={{ marginTop: 16 }}>
                         <Space align="center" wrap>
                             <Text>Auto:</Text>
                             <Switch checked={autoEnabled} onChange={setAutoEnabled} />
@@ -176,7 +176,7 @@ const DeviceDetail = () => {
                                 min={3} max={3600}
                                 value={intervalSec}
                                 onChange={setIntervalSec}
-                                addonAfter="giay"
+                                addonAfter="giây"
                                 style={{ width: 140 }}
                             />
                             <Button
@@ -184,7 +184,7 @@ const DeviceDetail = () => {
                                 loading={cmdLoading.autoConfig}
                                 onClick={handleAutoConfig}
                             >
-                                Luu
+                                Lưu
                             </Button>
                         </Space>
                     </Card>

@@ -25,18 +25,18 @@ const Dashboard = () => {
     const handleCapture = async (deviceId) => {
         try {
             await apiService.capturePhoto(deviceId);
-            message.success(`Da gui lenh chup anh den ${deviceId}`);
+            message.success(`Đã gửi lệnh chụp ảnh đến ${deviceId}`);
         } catch (error) {
-            handleApiError(error, { defaultMessage: 'Khong the gui lenh chup anh' });
+            handleApiError(error, { defaultMessage: 'Không thể gửi lệnh chụp ảnh' });
         }
     };
 
     const handleBroadcastCapture = async () => {
         try {
             await apiService.broadcastCapture();
-            message.success('Da gui lenh chup anh den tat ca thiet bi');
+            message.success('Đã gửi lệnh chụp ảnh đến tất cả thiết bị');
         } catch (error) {
-            handleApiError(error, { defaultMessage: 'Khong the gui broadcast' });
+            handleApiError(error, { defaultMessage: 'Không thể gửi broadcast' });
         }
     };
 
@@ -48,7 +48,7 @@ const Dashboard = () => {
         <div>
             {/* Page header */}
             <div className="page-header">
-                <Title level={2} style={{ margin: 0 }}>Tong quan he thong</Title>
+                <Title level={2} style={{ margin: 0 }}>Tổng quan hệ thống</Title>
                 <Space>
                     <Button icon={<SendOutlined />} onClick={handleBroadcastCapture}>
                         Capture All
@@ -60,7 +60,7 @@ const Dashboard = () => {
                         unCheckedChildren="Offline"
                     />
                     <Button icon={<ReloadOutlined />} onClick={refresh} loading={loading}>
-                        Lam moi
+                        Làm mới
                     </Button>
                 </Space>
             </div>
@@ -70,7 +70,7 @@ const Dashboard = () => {
                 <Col xs={24} sm={12} lg={6}>
                     <Card className="stats-card">
                         <Statistic
-                            title="Tong thiet bi"
+                            title="Tổng thiết bị"
                             value={counts.total}
                             prefix={<CameraOutlined style={{ color: '#1890ff' }} />}
                             valueStyle={{ color: '#1890ff' }}
@@ -112,9 +112,9 @@ const Dashboard = () => {
             {/* Device grid + Event feed */}
             <Row gutter={[16, 16]}>
                 <Col xs={24} lg={16}>
-                    <Title level={4} style={{ marginBottom: 16 }}>Thiet bi</Title>
+                    <Title level={4} style={{ marginBottom: 16 }}>Thiết bị</Title>
                     {devices.length === 0 ? (
-                        <Card><p style={{ textAlign: 'center', color: '#999' }}>Chua co thiet bi nao</p></Card>
+                        <Card><p style={{ textAlign: 'center', color: '#999' }}>Chưa có thiết bị nào</p></Card>
                     ) : (
                         <Row gutter={[12, 12]}>
                             {devices.map((device) => (

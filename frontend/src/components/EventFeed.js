@@ -15,11 +15,11 @@ const { Text } = Typography;
 
 const CATEGORY_CONFIG = {
     presence: { color: 'blue', icon: <WifiOutlined /> },
-    event:    { color: 'green', icon: <CloudUploadOutlined /> },
-    ack:      { color: 'cyan', icon: <SyncOutlined /> },
-    ota:      { color: 'purple', icon: <ToolOutlined /> },
-    warning:  { color: 'orange', icon: <WarningOutlined /> },
-    config:   { color: 'geekblue', icon: <SyncOutlined /> },
+    event: { color: 'green', icon: <CloudUploadOutlined /> },
+    ack: { color: 'cyan', icon: <SyncOutlined /> },
+    ota: { color: 'purple', icon: <ToolOutlined /> },
+    warning: { color: 'orange', icon: <WarningOutlined /> },
+    config: { color: 'geekblue', icon: <SyncOutlined /> },
 };
 
 function eventLabel(event) {
@@ -45,7 +45,7 @@ const EventFeed = ({ events = [], title = 'Event Feed', maxHeight = 400, showDev
             bodyStyle={{ maxHeight, overflowY: 'auto', padding: 0 }}
         >
             {events.length === 0 ? (
-                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chua co event" style={{ padding: 24 }} />
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chưa có sự kiện nào" style={{ padding: 24 }} />
             ) : (
                 <List
                     size="small"

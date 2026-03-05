@@ -7,10 +7,10 @@ const { Header } = Layout;
 
 const AppHeader = () => {
     const userMenuItems = [
-        { key: 'profile',  icon: <UserOutlined />,    label: 'Ho so' },
-        { key: 'settings', icon: <SettingOutlined />,  label: 'Cai dat' },
+        { key: 'profile', icon: <UserOutlined />, label: 'Hồ sơ' },
+        { key: 'settings', icon: <SettingOutlined />, label: 'Cài đặt' },
         { type: 'divider' },
-        { key: 'logout',   icon: <LogoutOutlined />,   label: 'Dang xuat' },
+        { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất' },
     ];
 
     return (

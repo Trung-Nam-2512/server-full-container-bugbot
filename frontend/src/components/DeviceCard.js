@@ -18,14 +18,14 @@ const DeviceCard = ({ device, onCapture, onDetail }) => {
             className="device-card-item"
             onClick={() => onDetail?.(device.deviceId)}
             actions={[
-                <Tooltip title="Chup anh" key="capture">
+                <Tooltip title="Chụp ảnh" key="capture">
                     <Button
                         type="text"
                         icon={<PlayCircleOutlined />}
                         onClick={(e) => { e.stopPropagation(); onCapture?.(device.deviceId); }}
                     />
                 </Tooltip>,
-                <Tooltip title="Chi tiet" key="detail">
+                <Tooltip title="Chi tiết" key="detail">
                     <Button
                         type="text"
                         icon={<InfoCircleOutlined />}
@@ -53,7 +53,7 @@ const DeviceCard = ({ device, onCapture, onDetail }) => {
                             <Text type="secondary" style={{ fontSize: 12 }}>IP: {device.ip}</Text>
                         )}
                         <Text type="secondary" style={{ fontSize: 11 }}>
-                            {device.lastSeenAt ? dayjs(device.lastSeenAt).fromNow() : 'Chua ket noi'}
+                            {device.lastSeenAt ? dayjs(device.lastSeenAt).fromNow() : 'Chưa kết nối'}
                         </Text>
                     </Space>
                 }
