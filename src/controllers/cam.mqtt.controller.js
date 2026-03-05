@@ -200,8 +200,14 @@ async function sseEventsStream(req, res) {
     // 3. Đăng ký client với Processor
     const removeClient = eventProcessor.addSSEClient(res);
 
-    // 4. Lắng nghe sự kiện ngắt kết nối (VD: User đóng tab)
+    // 4. Heartbeat (Giữ kết nối không bị timeout bởi proxy/cloud)
+    const heartbeat = setInterval(() => {
+        res.write(': heartbeat\n\n');
+    }, 15000);
+
+    // 5. Lắng nghe sự kiện ngắt kết nối (VD: User đóng tab)
     req.on('close', () => {
+        clearInterval(heartbeat);
         removeClient();
     });
 }

@@ -219,16 +219,51 @@ function transformInternalUrlToPublic(url) {
 }
 
 /**
+ * Extract object key from URL
+ * @param {string} url - Either a full URL or a relative path
+ * @param {string} bucket - Bucket name
+ * @returns {string} - Extracted object key
+ */
+function extractObjectKey(url, bucket = BUCKET_NAME) {
+    if (!url) return '';
+
+    try {
+        const urlObj = new URL(url);
+        const searchParams = new URLSearchParams(urlObj.search);
+        const prefix = searchParams.get('prefix');
+
+        if (prefix && urlObj.pathname.includes('/api/v1/buckets/')) {
+            // MinIO Console URL format -> decode base64 prefix
+            return Buffer.from(prefix, 'base64').toString('utf8');
+        } else {
+            // Direct URL format -> remove bucket name from path
+            const parts = urlObj.pathname.split('/').filter(Boolean);
+            const bucketIndex = parts.indexOf(bucket);
+            if (bucketIndex !== -1) {
+                return parts.slice(bucketIndex + 1).join('/');
+            }
+            return parts.join('/');
+        }
+    } catch {
+        // Not a full URL -> already a path, just remove leading bucket if present
+        const bucketPrefix = new RegExp(`^\\/?${bucket}\\/`);
+        return url.replace(bucketPrefix, '').replace(/^\//, '');
+    }
+}
+
+/**
  * Delete object from MinIO
  * @param {string} objectKey
+ * @param {string} bucket - Bucket name (optional, defaults to BUCKET_NAME)
  */
-async function deleteObject(objectKey) {
+async function deleteObject(objectKey, bucket = BUCKET_NAME) {
+    if (!objectKey) return true;
     try {
-        await minioClient.removeObject(BUCKET_NAME, objectKey);
-        logger.debug({ objectKey }, 'Object deleted from MinIO');
+        await minioClient.removeObject(bucket, objectKey);
+        logger.debug({ bucket, objectKey }, 'Object deleted from MinIO');
         return true;
     } catch (error) {
-        logger.error({ error: error.message, objectKey }, 'Failed to delete object from MinIO');
+        logger.error({ error: error.message, bucket, objectKey }, 'Failed to delete object from MinIO');
         return false;
     }
 }
@@ -253,6 +288,7 @@ module.exports = {
     getObjectUrl,
     getPublicObjectUrl,
     transformInternalUrlToPublic,
+    extractObjectKey,
     deleteObject,
     isMinIOHealthy,
     getMinioClient: () => minioClient,

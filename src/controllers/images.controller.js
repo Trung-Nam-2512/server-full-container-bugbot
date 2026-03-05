@@ -85,22 +85,15 @@ exports.downloadImage = async (req, res, next) => {
 exports.deleteImage = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const images = await getAllImages();
-        const image = images.find(img => img.id === id);
 
-        if (!image) {
-            return res.status(404).json({ ok: false, error: "Image not found" });
-        }
-
-        // Delete file from disk
-        try {
-            await fs.unlink(image.filePath);
-        } catch (err) {
-            logger.warn({ filePath: image.filePath }, 'File not found on disk, continuing with deletion');
-        }
+        // Gọi service xóa (xử lý cả ClickHouse và MinIO)
+        await imagesService.deleteImage(id);
 
         res.json({ ok: true, message: "Image deleted successfully" });
     } catch (error) {
+        if (error.message === 'Image not found') {
+            return res.status(404).json({ ok: false, error: "Image not found" });
+        }
         logger.error({ error: error.message, imageId: req.params.id }, 'Error in deleteImage controller');
         next(error);
     }

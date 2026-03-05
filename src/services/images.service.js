@@ -481,10 +481,63 @@ function formatTimestamp(dt) {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
 
+/**
+ * Xóa ảnh từ ClickHouse và MinIO
+ * @param {string} imageId - shot_id của ảnh
+ */
+async function deleteImage(imageId) {
+    try {
+        // 1. Lấy thông tin ảnh trước khi xóa
+        const image = await getImageById(imageId);
+        if (!image) {
+            throw new Error('Image not found');
+        }
+
+        const { extractObjectKey, deleteObject, BUCKET_NAME } = require('../libs/minio');
+        const clickhouseClient = getClickHouseClient();
+
+        // 2. Xóa file từ MinIO (Raw image)
+        if (image.url) {
+            const rawKey = extractObjectKey(image.url, BUCKET_NAME);
+            if (rawKey) {
+                await deleteObject(rawKey, BUCKET_NAME);
+            }
+        }
+
+        // 3. Xóa file từ MinIO (Annotated image nếu có)
+        if (image.annotatedImageUrl) {
+            // Thường annotated image nằm trong bucket khác (như iot-annotated)
+            const annBucket = 'iot-annotated';
+            const annKey = extractObjectKey(image.annotatedImageUrl, annBucket);
+            if (annKey) {
+                await deleteObject(annKey, annBucket);
+            }
+        }
+
+        // 4. Xóa record từ ClickHouse
+        // ClickHouse DELETE (ALTER TABLE ... DELETE) là async và tốn kém, nhưng cần thiết
+        // Lưu ý: ClickHouse Cloud hoặc version mới dùng lightweight deletes
+        const deleteRawQuery = `ALTER TABLE iot.events_raw DELETE WHERE shot_id = {image_id:String}`;
+        const deleteEnrichedQuery = `ALTER TABLE iot.events_enriched DELETE WHERE shot_id = {image_id:String}`;
+
+        await Promise.all([
+            clickhouseClient.command({ query: deleteRawQuery, query_params: { image_id: imageId } }),
+            clickhouseClient.command({ query: deleteEnrichedQuery, query_params: { image_id: imageId } })
+        ]);
+
+        logger.info({ imageId }, 'Image deleted successfully from MinIO and ClickHouse');
+        return true;
+    } catch (error) {
+        logger.error({ error: error.message, imageId }, 'Failed to delete image from service');
+        throw error;
+    }
+}
+
 module.exports = {
     getImages,
     getImageById,
     getImagesFromFilesystem,
+    deleteImage,
 };
 
 
