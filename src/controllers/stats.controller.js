@@ -177,8 +177,8 @@ async function getOverallStats() {
             SELECT COUNT(*) as count 
             FROM iot.events_raw 
             WHERE device_id NOT LIKE '%test%'
-              AND toDate(created_at) >= toDate({start:DateTime64(3)}) 
-              AND toDate(created_at) < toDate({end:DateTime64(3)})
+              AND toDate(timestamp) >= toDate({start:DateTime64(3)}) 
+              AND toDate(timestamp) < toDate({end:DateTime64(3)})
         `,
         query_params: {
             start: formatTimestamp(today),
@@ -196,7 +196,7 @@ async function getOverallStats() {
             SELECT uniq(device_id) as count 
             FROM iot.events_raw 
             WHERE device_id NOT LIKE '%test%'
-              AND created_at >= {threshold:DateTime64(3)}
+              AND timestamp >= {threshold:DateTime64(3)}
         `,
         query_params: {
             threshold: formatTimestamp(fiveMinutesAgo),
@@ -233,7 +233,7 @@ async function getDevicesList() {
         query: `
             SELECT 
                 device_id,
-                max(created_at) as last_seen,
+                max(timestamp) as last_seen,
                 count(*) as image_count
             FROM iot.events_raw
             WHERE device_id NOT LIKE '%test%'

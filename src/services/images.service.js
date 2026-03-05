@@ -400,7 +400,7 @@ async function getImagesFromFilesystem(filters = {}) {
                                     url: `/uploads/${currentDeviceId}/${yearDir.name}/${monthDir.name}/${dayDir.name}/${file}`,
                                     filePath,
                                     size: stats.size,
-                                    createdAt: timestamp || stats.birthtime,
+                                    timestamp: timestamp || stats.birthtime,
                                     updatedAt: stats.mtime,
                                     hasDetections: false,
                                     detectionCount: 0,
@@ -425,7 +425,7 @@ async function getImagesFromFilesystem(filters = {}) {
             const start = new Date(startDate);
             const end = new Date(endDate);
             filteredImages = filteredImages.filter(img => {
-                const imgDate = new Date(img.createdAt);
+                const imgDate = new Date(img.timestamp); // Changed from createdAt to timestamp
                 return imgDate >= start && imgDate <= end;
             });
         }
@@ -435,7 +435,7 @@ async function getImagesFromFilesystem(filters = {}) {
             let aVal = a[sortBy];
             let bVal = b[sortBy];
 
-            if (sortBy === 'createdAt' || sortBy === 'updatedAt') {
+            if (sortBy === 'createdAt' || sortBy === 'updatedAt' || sortBy === 'timestamp') { // Added timestamp
                 aVal = new Date(aVal).getTime();
                 bVal = new Date(bVal).getTime();
             }
