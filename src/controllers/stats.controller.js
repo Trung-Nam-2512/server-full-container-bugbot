@@ -177,8 +177,8 @@ async function getOverallStats() {
             SELECT COUNT(*) as count 
             FROM iot.events_raw 
             WHERE device_id NOT LIKE '%test%'
-              AND toDate(timestamp) >= toDate({start:DateTime64(3)}) 
-              AND toDate(timestamp) < toDate({end:DateTime64(3)})
+              AND toDate(toTimeZone(timestamp, 'Asia/Ho_Chi_Minh')) >= toDate(toTimeZone({start:DateTime64(3)}, 'Asia/Ho_Chi_Minh')) 
+              AND toDate(toTimeZone(timestamp, 'Asia/Ho_Chi_Minh')) < toDate(toTimeZone({end:DateTime64(3)}, 'Asia/Ho_Chi_Minh'))
         `,
         query_params: {
             start: formatTimestamp(today),
@@ -233,7 +233,7 @@ async function getDevicesList() {
         query: `
             SELECT 
                 device_id,
-                max(timestamp) as last_seen,
+                toTimeZone(max(timestamp), 'Asia/Ho_Chi_Minh') as last_seen,
                 count(*) as image_count
             FROM iot.events_raw
             WHERE device_id NOT LIKE '%test%'

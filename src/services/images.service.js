@@ -78,7 +78,7 @@ async function getImages(filters = {}) {
         const query = `
             SELECT 
                 r.device_id,
-                r.timestamp,
+                toTimeZone(r.timestamp, 'Asia/Ho_Chi_Minh') as timestamp,
                 r.shot_id,
                 r.image_url,
                 r.image_size,
@@ -89,7 +89,7 @@ async function getImages(filters = {}) {
                 e.detections,
                 e.inference_model,
                 e.processing_time_ms,
-                e.processed_at
+                toTimeZone(e.processed_at, 'Asia/Ho_Chi_Minh') as processed_at
             FROM iot.events_raw r
             LEFT JOIN iot.events_enriched e 
                 ON r.device_id = e.device_id 

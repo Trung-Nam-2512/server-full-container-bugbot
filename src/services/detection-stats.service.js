@@ -13,7 +13,7 @@ const { logger } = require('../libs/logger');
 async function getOverallDetectionStats() {
     // Require ClickHouse lib in function (same pattern as stats.controller.js)
     const clickhouseLib = require('../libs/clickhouse');
-    
+
     // Check health (async function)
     const isHealthy = await clickhouseLib.isClickHouseHealthy();
     if (!isHealthy) {
@@ -28,7 +28,7 @@ async function getOverallDetectionStats() {
         logger.error({ error: error.message }, 'Failed to get ClickHouse client');
         throw new Error('ClickHouse client not initialized');
     }
-    
+
     if (!clickhouseClient || typeof clickhouseClient.query !== 'function') {
         logger.error({ hasClient: !!clickhouseClient, clientType: typeof clickhouseClient }, 'ClickHouse client invalid');
         throw new Error('ClickHouse client invalid - missing query method');
@@ -52,8 +52,8 @@ async function getOverallDetectionStats() {
         const totalImages = parseInt(totalImagesData[0]?.count || 0, 10);
 
         // Calculate average detections per image
-        const avgDetectionsPerImage = totalImages > 0 
-            ? (totalDetections / totalImages).toFixed(2) 
+        const avgDetectionsPerImage = totalImages > 0
+            ? (totalDetections / totalImages).toFixed(2)
             : 0;
 
         // Get today's detections
@@ -78,8 +78,8 @@ async function getOverallDetectionStats() {
             query: `
                 SELECT sum(detection_count) as count
                 FROM iot.events_enriched
-                WHERE toDate(processed_at) >= toDate({start:DateTime64(3)})
-                  AND toDate(processed_at) < toDate({end:DateTime64(3)})
+                WHERE toDate(toTimeZone(processed_at, 'Asia/Ho_Chi_Minh')) >= toDate(toTimeZone({start:DateTime64(3)}, 'Asia/Ho_Chi_Minh'))
+                  AND toDate(toTimeZone(processed_at, 'Asia/Ho_Chi_Minh')) < toDate(toTimeZone({end:DateTime64(3)}, 'Asia/Ho_Chi_Minh'))
             `,
             query_params: {
                 start: formatTimestamp(today),
@@ -126,7 +126,7 @@ async function getOverallDetectionStats() {
  */
 async function getSpeciesDistribution(deviceId = null) {
     const clickhouseLib = require('../libs/clickhouse');
-    
+
     const isHealthy = await clickhouseLib.isClickHouseHealthy();
     if (!isHealthy) {
         throw new Error('ClickHouse not connected');
@@ -184,7 +184,7 @@ async function getSpeciesDistribution(deviceId = null) {
             .map(([species, count]) => ({
                 species,
                 count,
-                percentage: totalDetections > 0 
+                percentage: totalDetections > 0
                     ? parseFloat(((count / totalDetections) * 100).toFixed(2))
                     : 0,
             }))
@@ -205,7 +205,7 @@ async function getSpeciesDistribution(deviceId = null) {
  */
 async function getConfidenceDistribution(deviceId = null) {
     const clickhouseLib = require('../libs/clickhouse');
-    
+
     const isHealthy = await clickhouseLib.isClickHouseHealthy();
     if (!isHealthy) {
         throw new Error('ClickHouse not connected');
@@ -312,7 +312,7 @@ async function getConfidenceDistribution(deviceId = null) {
  */
 async function getDetectionTimeline(period = 'day', deviceId = null) {
     const clickhouseLib = require('../libs/clickhouse');
-    
+
     const isHealthy = await clickhouseLib.isClickHouseHealthy();
     if (!isHealthy) {
         throw new Error('ClickHouse not connected');
@@ -329,13 +329,13 @@ async function getDetectionTimeline(period = 'day', deviceId = null) {
 
         if (period === 'day') {
             startDate.setUTCDate(startDate.getUTCDate() - 7); // Last 7 days
-            groupBy = 'toDate(processed_at)';
+            groupBy = "toDate(toTimeZone(processed_at, 'Asia/Ho_Chi_Minh'))";
         } else if (period === 'week') {
             startDate.setUTCDate(startDate.getUTCDate() - 56); // Last 8 weeks
-            groupBy = 'toMonday(processed_at)'; // Group by week
+            groupBy = "toMonday(toTimeZone(processed_at, 'Asia/Ho_Chi_Minh'))"; // Group by week
         } else if (period === 'month') {
             startDate.setUTCMonth(startDate.getUTCMonth() - 12); // Last 12 months
-            groupBy = 'toStartOfMonth(processed_at)'; // Group by month
+            groupBy = "toStartOfMonth(toTimeZone(processed_at, 'Asia/Ho_Chi_Minh'))"; // Group by month
         }
 
         const formatTimestamp = (dt) => {
