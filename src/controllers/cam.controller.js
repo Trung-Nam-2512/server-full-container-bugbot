@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const cfg = require("../config");
 const { uploadImage } = require("../libs/minio");
 const { publishEvent } = require("../libs/kafka");
+const { insertEvent } = require("../libs/clickhouse");
 const { logger } = require("../libs/logger");
 
 // ===== In-memory de-dup & stale guard =====
@@ -130,7 +131,7 @@ exports.upload = async (req, res, next) => {
             // Re-init MinIO if needed (in case it wasn't ready at startup)
             const { initMinIO } = require("../libs/minio");
             await initMinIO();
-            
+
             minioResult = await uploadImage(
                 file.buffer,
                 deviceId,
@@ -140,10 +141,10 @@ exports.upload = async (req, res, next) => {
             );
             logger.info({ deviceId, shotId, objectKey: minioResult.objectKey }, 'Image uploaded to MinIO');
         } catch (minioError) {
-            logger.error({ 
-                error: minioError.message, 
+            logger.error({
+                error: minioError.message,
                 stack: minioError.stack,
-                deviceId 
+                deviceId
             }, 'Failed to upload to MinIO, but continuing with filesystem');
             // Continue even if MinIO fails - backward compatibility
         }
@@ -167,6 +168,16 @@ exports.upload = async (req, res, next) => {
                 const kafkaTopic = process.env.KAFKA_TOPIC_RAW || 'events.raw';
                 await publishEvent(kafkaTopic, eventPayload, deviceId);
                 logger.info({ deviceId, topic: kafkaTopic }, 'Event published to Kafka');
+
+                // 8.1) Optional: Directly insert to ClickHouse (Fixed for Windows line endings)
+                if (String(process.env.CLICKHOUSE_DIRECT_INSERT).trim() === 'true') {
+                    try {
+                        await insertEvent(eventPayload);
+                        logger.info({ deviceId, shotId }, '🚀 [DIRECT INSERT] Success (Legacy Route)');
+                    } catch (chError) {
+                        logger.error({ error: chError.message, deviceId }, '❌ [DIRECT INSERT] Failed, but continuing');
+                    }
+                }
             } catch (kafkaError) {
                 logger.error({ error: kafkaError.message, deviceId }, 'Failed to publish to Kafka, but continuing');
             }
