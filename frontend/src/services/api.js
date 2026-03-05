@@ -106,21 +106,21 @@ export const apiService = {
     // Image management
     getImages: (params = {}) => {
         const queryParams = new URLSearchParams(params);
-        return api.get(`/cam/images?${queryParams}`);
+        return api.get(`/api/cam/images?${queryParams}`);
     },
-    getImageById: (imageId) => api.get(`/cam/images/${imageId}`),
-    deleteImage: (imageId) => api.delete(`/cam/images/${imageId}`),
-    downloadImage: (imageId) => api.get(`/cam/images/${imageId}/download`, { responseType: 'blob' }),
+    getImageById: (imageId) => api.get(`/api/cam/images/${imageId}`),
+    deleteImage: (imageId) => api.delete(`/api/cam/images/${imageId}`),
+    downloadImage: (imageId) => api.get(`/api/cam/images/${imageId}/download`, { responseType: 'blob' }),
 
     // Statistics
-    getStats: () => api.get('/cam/stats'),
-    getDeviceStats: (deviceId) => api.get(`/cam/stats/${deviceId}`),
+    getStats: () => api.get('/api/cam/stats'),
+    getDeviceStats: (deviceId) => api.get(`/api/cam/stats/${deviceId}`),
 
     // Health check
-    getHealth: () => api.get('/health'),
+    getHealth: () => api.get('/api/health'),
 
     // Upload (testing)
-    uploadImage: (formData) => api.post('/iot/cam/upload', formData, {
+    uploadImage: (formData) => api.post('/api/iot/cam/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     }),
 };
