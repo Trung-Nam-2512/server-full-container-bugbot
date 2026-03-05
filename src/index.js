@@ -30,7 +30,7 @@ const { startEnrichedEventsProcessor, stopEnrichedEventsProcessor } = require(".
  */
 async function initInfrastructure() {
     logger.info('Initializing infrastructure services...');
-    
+
     const results = await Promise.allSettled([
         initKafka(),
         initMinIO(),
@@ -66,21 +66,21 @@ async function initInfrastructure() {
  */
 async function gracefulShutdown(signal) {
     logger.info({ signal }, 'Received shutdown signal, closing gracefully...');
-    
+
     try {
         // Stop MQTT + processors
         eventProcessor.stop();
         mqtt.stop();
         await stopStreamProcessor();
         await stopEnrichedEventsProcessor();
-        
+
         // Close connections
         await Promise.all([
             disconnectKafka(),
             closeClickHouse(),
             closeMongoDB(),
         ]);
-        
+
         logger.info('All connections closed successfully');
         process.exit(0);
     } catch (error) {
@@ -100,22 +100,22 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
     try {
         // Create upload directory
         await mkdirp(cfg.uploadDir);
-        
+
         // Initialize infrastructure
         await initInfrastructure();
-        
+
         // Initialize device registry (load from MongoDB)
         await deviceRegistry.init();
 
         // Start MQTT service + event processor
-        if (process.env.MQTT_ENABLED === 'true') {
+        if (String(process.env.MQTT_ENABLED).trim() === 'true') {
             mqtt.start();
             eventProcessor.start(mqtt, deviceRegistry);
             logger.info('MQTT service + event processor started');
         }
 
         // Start stream processor if enabled
-        if (process.env.STREAM_PROCESSOR_ENABLED !== 'false') {
+        if (String(process.env.STREAM_PROCESSOR_ENABLED).trim() !== 'false') {
             const kafka = getKafka();
             if (kafka) {
                 try {
@@ -130,7 +130,7 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
         }
 
         // Start enriched events processor if enabled (Phase 3)
-        if (process.env.ENRICHED_EVENTS_PROCESSOR_ENABLED !== 'false') {
+        if (String(process.env.ENRICHED_EVENTS_PROCESSOR_ENABLED).trim() !== 'false') {
             const kafka = getKafka();
             if (kafka) {
                 try {
@@ -143,17 +143,17 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
                 logger.warn('⚠️ Kafka not available, enriched events processor not started');
             }
         }
-        
+
         // Create HTTP server
         const server = http.createServer(app);
-        
+
         server.listen(cfg.port, () => {
             const serverIP = getServerIP();
             const allIPs = getAllIPs();
 
             logger.info('🚀 Server started successfully');
             logger.info(`   Primary: http://${serverIP}:${cfg.port}`);
-            
+
             if (allIPs.length > 1) {
                 allIPs.forEach(ip => {
                     logger.info(`   Network: http://${ip.address}:${cfg.port} (${ip.interface})`);

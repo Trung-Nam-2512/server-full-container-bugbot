@@ -32,7 +32,7 @@ function rememberShot(deviceId, shotId, ts) {
     const key = `${deviceId}:${shotId}`;
     SEEN.set(key, { ts, at: nowMs() });
     FIFO.push(key);
-    
+
     if (FIFO.length > 5000) {
         const cut = FIFO.splice(0, 1000);
         const t = nowMs();
@@ -67,7 +67,7 @@ function clientIp(req) {
  */
 function parseTimestamp(ts) {
     const tsStr = String(ts);
-    
+
     if (tsStr.length === 14) {
         // Format: YYYYMMDDHHMMSS
         const year = tsStr.substring(0, 4);
@@ -121,7 +121,7 @@ async function processUpload({
             const hash = sha256(fileBuffer);
             const message = `${deviceId}.${ts}.${hash}`;
             const expected = hmacSha256(process.env.HMAC_SECRET, message);
-            
+
             if (signature.toLowerCase() !== expected.toLowerCase()) {
                 const error = new Error('Invalid signature');
                 error.status = 401;
@@ -210,12 +210,12 @@ async function processUpload({
         logger.info({ deviceId, topic: kafkaTopic }, 'Event published to Kafka');
 
         // 9. Optional: Directly insert to ClickHouse (or let Spark handle it)
-        if (process.env.CLICKHOUSE_DIRECT_INSERT === 'true') {
+        if (String(process.env.CLICKHOUSE_DIRECT_INSERT).trim() === 'true') {
             try {
                 await insertEvent(eventPayload);
-                logger.debug({ deviceId }, 'Event inserted to ClickHouse');
+                logger.info({ deviceId, shotId }, '🚀 [DIRECT INSERT] Event inserted to ClickHouse');
             } catch (error) {
-                logger.error({ error: error.message }, 'Failed to insert to ClickHouse, but continuing');
+                logger.error({ error: error.message }, '❌ [DIRECT INSERT] Failed to insert to ClickHouse, but continuing');
             }
         }
 
