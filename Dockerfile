@@ -9,9 +9,7 @@ RUN npm ci --only=production
 
 # Copy application code
 COPY src/ ./src/
-COPY config/ ./config/
 COPY infra/ ./infra/
-COPY schemas/ ./schemas/
 
 # Create uploads directory
 RUN mkdir -p uploads
